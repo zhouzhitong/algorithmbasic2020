@@ -2,6 +2,7 @@ package class10;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 public class Code01_UnionFind {
@@ -15,9 +16,17 @@ public class Code01_UnionFind {
 	}
 
 	public static class UnionSet<V> {
+		// V --> 节点信息
 		public HashMap<V, Node<V>> nodes;
-		public HashMap<Node<V>, Node<V>> parents;
-		public HashMap<Node<V>, Integer> sizeMap;
+		// 子节点 --> 父节点
+		public Map<Node<V>, Node<V>> parents;
+		// 最终父节点 --> 子节点个数
+		public Map<Node<V>, Integer> sizeMap;
+
+		public UnionSet() {
+			this.parents = new HashMap<>();
+			sizeMap = new HashMap<>();
+		}
 
 		public UnionSet(List<V> values) {
 			for (V cur : values) {
@@ -35,20 +44,21 @@ public class Code01_UnionFind {
 				path.push(cur);
 				cur = parents.get(cur);
 			}
-			// cur头节点
+			// 优化：将经过的的子节点，连接上顶层的父节点。
 			while (!path.isEmpty()) {
 				parents.put(path.pop(), cur);
 			}
+			// cur头节点
 			return cur;
 		}
-
+		// 判断 a, b 是否是 是否是同一个集合
 		public boolean isSameSet(V a, V b) {
 			if (!nodes.containsKey(a) || !nodes.containsKey(b)) {
 				return false;
 			}
 			return findFather(nodes.get(a)) == findFather(nodes.get(b));
 		}
-
+		// 将 节点A 和B 结合起来
 		public void union(V a, V b) {
 			if (!nodes.containsKey(a) || !nodes.containsKey(b)) {
 				return;
